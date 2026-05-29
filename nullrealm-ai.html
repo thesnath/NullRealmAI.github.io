@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NullRealm AI — Cinematic AI Content</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #050507;
+    --deep: #0a0a10;
+    --surface: #111118;
+    --card: #16161f;
+    --border: rgba(255,255,255,0.07);
+    --border-glow: rgba(180,140,255,0.25);
+    --text: #e8e6f0;
+    --muted: #7a7890;
+    --accent: #b48cff;
+    --accent-dim: #7a5ab8;
+    --accent-glow: rgba(180,140,255,0.15);
+    --red: #ff4f4f;
+    --gold: #e8c87a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(180,140,255,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: linear-gradient(to bottom, rgba(5,5,7,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(0px);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .logo-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.6); }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border: 1px solid var(--border-glow);
+    padding: 0.55rem 1.4rem;
+    border-radius: 2px;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  .nav-cta:hover {
+    background: var(--accent-glow);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 60%, rgba(100,60,180,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 20% 80%, rgba(180,140,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 80% 20%, rgba(60,20,120,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-style: italic;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadein 1s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4.5rem, 12vw, 10rem);
+    line-height: 0.92;
+    letter-spacing: 0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: slidein 1s 0.5s forwards;
+  }
+
+  .hero-title span {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.15);
+  }
+
+  .hero-sub {
+    max-width: 520px;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadein 1s 0.8s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadein 1s 1s forwards;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0010;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.9rem 2.5rem;
+    border-radius: 2px;
+    transition: background 0.3s ease, transform 0.2s ease;
+    border: none;
+    cursor: none;
+  }
+
+  .btn-primary:hover {
+    background: #c9aaff;
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.9rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: border-color 0.3s ease, transform 0.2s ease;
+    cursor: none;
+  }
+
+  .btn-ghost:hover {
+    border-color: rgba(255,255,255,0.25);
+    transform: translateY(-1px);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadein 1s 1.5s forwards;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--accent-dim));
+    animation: scroll-down 2s ease-in-out infinite;
+  }
+
+  @keyframes scroll-down {
+    0%, 100% { transform: scaleY(0); transform-origin: top; }
+    50% { transform: scaleY(1); transform-origin: top; }
+  }
+
+  /* SERVICES */
+  .section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-style: italic;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-desc {
+    max-width: 560px;
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 0.95rem;
+    margin-bottom: 4rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .service-card {
+    background: var(--card);
+    padding: 2.5rem;
+    position: relative;
+    transition: background 0.3s ease;
+    overflow: hidden;
+  }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .service-card:hover { background: #1a1a24; }
+  .service-card:hover::before { opacity: 1; }
+
+  .service-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+  }
+
+  .service-icon {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+    display: block;
+    filter: grayscale(0.3);
+  }
+
+  .service-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.8rem;
+    color: var(--text);
+  }
+
+  .service-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  .service-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--border-glow);
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--border) 20%, var(--border) 80%, transparent 100%);
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 0 4rem;
+  }
+
+  /* CONTACT */
+  .contact-section {
+    padding: 7rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .contact-info-block {
+    position: sticky;
+    top: 8rem;
+  }
+
+  .contact-detail {
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-detail-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-style: italic;
+  }
+
+  .contact-detail-value {
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .contact-detail-value a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(180,140,255,0.2);
+    transition: border-color 0.3s;
+  }
+
+  .contact-detail-value a:hover {
+    border-color: var(--accent);
+  }
+
+  .social-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+
+  .social-link:hover {
+    color: var(--text);
+    border-color: rgba(255,255,255,0.2);
+  }
+
+  /* FORM */
+  .contact-form {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-form::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .form-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-style: italic;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  select,
+  textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding: 0.8rem 1rem;
+    outline: none;
+    transition: border-color 0.3s ease, background 0.3s ease;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-dim);
+    background: rgba(180,140,255,0.04);
+  }
+
+  select {
+    cursor: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a7890'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+  }
+
+  select option { background: #16161f; }
+
+  textarea { resize: vertical; min-height: 130px; line-height: 1.65; }
+
+  .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-check input[type="checkbox"] {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--accent);
+  }
+
+  .form-check span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .form-submit {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0010;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 1rem;
+    border: none;
+    border-radius: 2px;
+    cursor: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .form-submit:hover {
+    background: #c9aaff;
+    transform: translateY(-1px);
+  }
+
+  .form-submit:active { transform: translateY(0); }
+
+  .form-error {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(255,79,79,0.25);
+    background: rgba(255,79,79,0.08);
+    color: #ffd7d7;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    border-radius: 2px;
+  }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .form-success-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .form-success-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-success-msg {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* FAQ */
+  .faq-section {
+    padding: 5rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .faq-list {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    text-align: left;
+    padding: 1.4rem 0;
+    cursor: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: color 0.3s;
+  }
+
+  .faq-q:hover { color: var(--accent); }
+
+  .faq-icon {
+    color: var(--accent-dim);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    font-weight: 200;
+  }
+
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+
+  .faq-item.open .faq-a { max-height: 200px; }
+
+  .faq-a p {
+    padding-bottom: 1.4rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-yt {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .footer-yt:hover { color: var(--accent); }
+
+  .yt-dot {
+    width: 5px; height: 5px;
+    background: var(--red);
+    border-radius: 50%;
+  }
+
+  /* Animations */
+  @keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slidein {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
+    .section, .contact-section, .faq-section { padding: 5rem 2rem; }
+    .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .contact-info-block { position: static; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 2rem; flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-dot"></div>
+    NullRealm
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Work With Us</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <p class="hero-eyebrow">@NullRealmAi — Cinematic AI Productions</p>
+  <h1 class="hero-title">
+    Worlds<br>
+    <span>Built From</span><br>
+    Imagination
+  </h1>
+  <p class="hero-sub">
+    We craft cinematic AI-generated content — dark thrillers, sci-fi epics, emotional storytelling, and visual experiences that push the boundary of what's possible.
+  </p>
+  <div class="hero-actions">
+    <a href="#contact" class="btn-primary">Get in Touch</a>
+    <a href="https://www.youtube.com/@NullRealmAi" target="_blank" class="btn-ghost">Watch Our Work ↗</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="reveal">
+    <p class="section-label">// What we offer</p>
+    <h2 class="section-title">Our Services</h2>
+    <p class="section-desc">From short-form viral content to long-form cinematic AI productions, we deliver visual storytelling that captivates audiences.</p>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <p class="service-num">01</p>
+      <span class="service-icon">🎬</span>
+      <h3 class="service-name">Cinematic AI Videos</h3>
+      <p class="service-desc">Fully AI-generated short films and cinematic sequences — dark, dramatic, visually stunning. Perfect for brand storytelling or standalone content.</p>
+      <span class="service-tag">Brand · Promo · Film</span>
+    </div>
+    <div class="service-card">
+      <p class="service-num">02</p>
+      <span class="service-icon">📣</span>
+      <h3 class="service-name">Sponsored Content</h3>
+      <p class="service-desc">Integrate your brand or product into NullRealm's cinematic universe. We craft custom AI visual narratives that feature your product authentically.</p>
+      <span class="service-tag">Sponsorship · Integration</span>
+    </div>
+    <div class="service-card">
+      <p class="service-num">03</p>
+      <span class="service-icon">🖼️</span>
+      <h3 class="service-name">AI Visual Packs</h3>
+      <p class="service-desc">Custom AI-generated image and video assets — characters, scenes, environments — delivered as production-ready media files for your projects.</p>
+      <span class="service-tag">Assets · Licensing</span>
+    </div>
+    <div class="service-card">
+      <p class="service-num">04</p>
+      <span class="service-icon">🤝</span>
+      <h3 class="service-name">Collaborations</h3>
+      <p class="service-desc">Co-create with NullRealm for mutual channel growth, creative cross-content, or joint AI productions with other creators and studios.</p>
+      <span class="service-tag">Creator · Studio</span>
+    </div>
+    <div class="service-card">
+      <p class="service-num">05</p>
+      <span class="service-icon">🧠</span>
+      <h3 class="service-name">AI Production Consulting</h3>
+      <p class="service-desc">Leverage our workflow expertise to set up your own AI content pipeline. We guide teams on tools, prompting, and production at scale.</p>
+      <span class="service-tag">Workshop · Consulting</span>
+    </div>
+    <div class="service-card">
+      <p class="service-num">06</p>
+      <span class="service-icon">✂️</span>
+      <h3 class="service-name">Custom Shorts & Reels</h3>
+      <p class="service-desc">High-impact vertical content tailored for TikTok, Instagram Reels, and YouTube Shorts — crafted for maximum visual punch and engagement.</p>
+      <span class="service-tag">Short-form · Social</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-layout">
+    <div class="contact-info-block reveal">
+      <p class="section-label">// Reach out</p>
+      <h2 class="section-title">Let's Create<br>Something<br>Unreal</h2>
+      <p class="section-desc" style="margin-bottom: 2.5rem;">Whether you're a brand, creator, or studio — we're open to collaborations, custom commissions, and sponsorship inquiries.</p>
+
+      <div class="contact-detail">
+        <p class="contact-detail-label">Email</p>
+        <p class="contact-detail-value">
+          <a href="mailto:thenullrealmstudio@gmail.com">thenullrealmstudio@gmail.com</a>
+        </p>
+      </div>
+      <div class="contact-detail">
+        <p class="contact-detail-label">Response Time</p>
+        <p class="contact-detail-value">Typically within 24–48 hours</p>
+      </div>
+      <div class="contact-detail">
+        <p class="contact-detail-label">Channel</p>
+        <p class="contact-detail-value">
+          <a href="https://www.youtube.com/@NullRealmAi" target="_blank">youtube.com/@NullRealmAi ↗</a>
+        </p>
+      </div>
+
+      <div class="social-links">
+        <a href="https://www.youtube.com/@NullRealmAi" target="_blank" class="social-link">
+          ▶ YouTube
+        </a>
+        <a href="https://www.tiktok.com/@nullrealmaistudio" target="_blank" class="social-link">
+          ◆ TikTok
+        </a>
+        <a href="https://www.instagram.com/nullrealmstudio_" target="_blank" class="social-link">
+          ○ Instagram
+        </a>
+      </div>
+    </div>
+
+    <form class="contact-form reveal" id="contactForm" novalidate>
+      <h3 class="form-title">Send a Message</h3>
+      <p class="form-sub">Fill in the details below and we'll get back to you as soon as possible.</p>
+
+      <input type="hidden" name="_subject" value="New inquiry from NullRealm AI website">
+      <input type="hidden" name="_source" value="GitHub Pages site">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" name="firstName" placeholder="John">
+        </div>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" name="lastName" placeholder="Doe">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@company.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="company">Company / Brand (optional)</label>
+        <input type="text" id="company" name="company" placeholder="Your brand or studio">
+      </div>
+
+      <div class="form-group">
+        <label for="service">Inquiry Type</label>
+        <select id="service" name="service" required>
+          <option value="" disabled selected>Select a service...</option>
+          <option>Cinematic AI Videos</option>
+          <option>Sponsored Content</option>
+          <option>AI Visual Packs</option>
+          <option>Collaboration</option>
+          <option>AI Production Consulting</option>
+          <option>Custom Shorts & Reels</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="budget">Estimated Budget (USD)</label>
+        <select id="budget" name="budget">
+          <option value="" disabled selected>Select range...</option>
+          <option>Under $500</option>
+          <option>$500 – $1,000</option>
+          <option>$1,000 – $5,000</option>
+          <option>$5,000 – $10,000</option>
+          <option>$10,000+</option>
+          <option>Open to discussion</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Your Message</label>
+        <textarea id="message" name="message" placeholder="Tell us about your project, vision, and timeline..." required></textarea>
+      </div>
+
+      <div class="form-check">
+        <input type="checkbox" id="agree" name="agree" required>
+        <span>I understand that NullRealm AI will use my details to respond to this inquiry. No spam, ever.</span>
+      </div>
+
+      <button class="form-submit" type="submit">Send Inquiry →</button>
+
+      <div class="form-error" id="formError"></div>
+
+      <div class="form-success" id="formSuccess">
+        <span class="form-success-icon">✦</span>
+        <p class="form-success-title">Message Received</p>
+        <p class="form-success-msg">Thank you for reaching out. We'll be in touch within 24–48 hours to discuss your project.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="reveal">
+    <p class="section-label">// Common questions</p>
+    <h2 class="section-title">FAQ</h2>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What kinds of brands or clients do you work with?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><p>We work with brands of all sizes — from indie creators to mid-size companies seeking bold, visually distinctive AI video content for marketing, product promotion, or creative campaigns.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        How long does a commissioned project take?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><p>Timelines vary by project scope. Short-form content (reels, shorts) typically takes 3–7 days. Full cinematic productions can range from 2–4 weeks depending on complexity and revisions.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Do you offer revision rounds?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><p>Yes — all packages include at least two rounds of revisions. We work closely with clients to ensure the final deliverable aligns with their vision before sign-off.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Can we license AI visuals for commercial use?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><p>Absolutely. We offer commercial licensing for AI visual packs and bespoke video assets. Licensing terms and usage rights are agreed upon before project commencement.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        What information should I include in my inquiry?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-a"><p>The more detail the better — your brand, the type of content you need, intended platforms, estimated budget, and any visual references or moodboards you have in mind. This helps us provide an accurate quote quickly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">NullRealm</a>
+  <p class="footer-copy">© 2025 NullRealm AI. All rights reserved.</p>
+  <a href="https://www.youtube.com/@NullRealmAi" target="_blank" class="footer-yt">
+    <span class="yt-dot"></span>
+    @NullRealmAi on YouTube
+  </a>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '14px';
+      cursor.style.height = '14px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => obs.observe(r));
+
+  // FAQ
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  }
+
+  // Form submit
+  const FORM_SPREE_ENDPOINT = 'https://formspree.io/f/xbdbbogq';
+  const contactForm = document.getElementById('contactForm');
+  const formError = document.getElementById('formError');
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', submitForm);
+  }
+
+  function showFormError(message) {
+    formError.textContent = message;
+    formError.style.display = 'block';
+  }
+
+  function clearFormError() {
+    formError.textContent = '';
+    formError.style.display = 'none';
+  }
+
+  async function submitForm(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const agree = document.getElementById('agree');
+    const email = document.getElementById('email');
+    const service = document.getElementById('service');
+    const msg = document.getElementById('message');
+    const success = document.getElementById('formSuccess');
+    const submitButton = form.querySelector('.form-submit');
+
+    clearFormError();
+
+    if (FORM_SPREE_ENDPOINT.includes('REPLACE_WITH_YOUR_FORM_ID')) {
+      showFormError('Add your Formspree form ID in the script before publishing this site.');
+      return;
+    }
+
+    if (!agree.checked || !email.value || !service.value || !msg.value) {
+      const fields = form.querySelectorAll('input:not([type=checkbox]), select, textarea');
+      fields.forEach(f => {
+        if (!f.value) {
+          f.style.borderColor = 'rgba(255,79,79,0.5)';
+          setTimeout(() => f.style.borderColor = '', 2000);
+        }
+      });
+
+      if (!agree.checked) {
+        document.querySelector('.form-check').style.color = '#ffd7d7';
+        setTimeout(() => document.querySelector('.form-check').style.color = '', 2000);
+      }
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = 'Sending...';
+
+    try {
+      const response = await fetch(FORM_SPREE_ENDPOINT, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Submission failed');
+      }
+
+      form.querySelectorAll('.form-group, .form-row, .form-check, .form-submit, .form-title, .form-sub, .form-error').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-10px)';
+        el.style.transition = 'opacity 0.3s, transform 0.3s';
+      });
+
+      form.reset();
+
+      setTimeout(() => {
+        form.querySelectorAll('.form-group, .form-row, .form-check, .form-submit, .form-title, .form-sub, .form-error').forEach(el => el.style.display = 'none');
+        success.style.display = 'block';
+      }, 400);
+    } catch (error) {
+      showFormError('Could not send your message right now. Please try again or email thenullrealmstudio@gmail.com directly.');
+      submitButton.disabled = false;
+      submitButton.textContent = 'Send Inquiry →';
+    }
+  }
+</script>
+</body>
+</html>
